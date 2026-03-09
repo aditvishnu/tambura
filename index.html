@@ -154,6 +154,8 @@
     font-size: 0.95rem;
     cursor: pointer;
     outline: none;
+    text-align: center;
+    text-align-last: center;
   }
 
   select:focus {
@@ -178,6 +180,12 @@
   .loading {
     color: #888;
     font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  .ios-hint {
+    font-size: 0.85rem;
+    color: #888;
     margin-top: 1rem;
   }
 </style>
@@ -262,6 +270,7 @@
   </div>
 
   <p class="loading" id="status">Loading samples...</p>
+  <p class="ios-hint" id="iosHint"></p>
 </div>
 
 <script>
@@ -512,6 +521,11 @@
     bpmValue.textContent = savedBpm + ' BPM';
   }
   updateFreqDisplay();
+
+  // --- iOS silent switch hint ---
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    document.getElementById('iosHint').innerHTML = '<span style="white-space:nowrap">No sound?</span> <span style="white-space:nowrap">Check your silent switch.</span>';
+  }
 
   // --- Init ---
   loadSamples();
