@@ -267,6 +267,7 @@
         <option value="Pa" selected>Panchamam</option>
         <option value="Ni">Nishadam</option>
       </select>
+      <span class="freq-value" id="string1FreqValue">196.00 Hz</span>
     </div>
     <div class="control-row">
       <label for="bpm">BPM</label>
@@ -296,6 +297,7 @@
   const bpmSlider = document.getElementById('bpm');
   const bpmValue = document.getElementById('bpmValue');
   const freqValue = document.getElementById('freqValue');
+  const string1FreqValue = document.getElementById('string1FreqValue');
   const status = document.getElementById('status');
   const beatEls = document.querySelectorAll('.beat');
 
@@ -490,7 +492,9 @@
   });
 
   function updateFreqDisplay() {
-    freqValue.textContent = midiToFreq(getRootMidi()).toFixed(2) + ' Hz';
+    const rootMidi = getRootMidi();
+    freqValue.textContent = midiToFreq(rootMidi).toFixed(2) + ' Hz';
+    string1FreqValue.textContent = midiToFreq(getTargetMidi(string1Sel.value, rootMidi)).toFixed(2) + ' Hz';
   }
 
   pitchSel.addEventListener('change', updateFreqDisplay);
@@ -501,6 +505,7 @@
   string1Sel.addEventListener('change', function () {
     pattern[0] = this.value;
     beat1NoteEl.textContent = string1Labels[this.value];
+    updateFreqDisplay();
   });
 
   // --- Init ---
