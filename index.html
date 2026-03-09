@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanpura Simulator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #120C05;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    text-align: center;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+    color: #C47A3A;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 2rem;
+  }
+
+  /* Beat indicators */
+  .beats {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .beat {
+    width: 64px;
+    height: 72px;
+    border-radius: 10px;
+    background: #1C1007;
+    border: 2px solid #3A2010;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, border-color 0.1s, box-shadow 0.1s;
+  }
+
+  .beat .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #aaa;
+    margin-bottom: 2px;
+  }
+
+  .beat .note {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ccc;
+  }
+
+  .beat.rest .note {
+    color: #555;
+  }
+
+  .beat.active {
+    border-color: #C47A3A;
+    background: #2A1508;
+    box-shadow: 0 0 16px rgba(196, 122, 58, 0.3);
+  }
+
+  .beat.active .label,
+  .beat.active .note {
+    color: #C47A3A;
+  }
+
+  /* Play button */
+  .play-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid #C47A3A;
+    background: transparent;
+    color: #C47A3A;
+    font-size: 1.8rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: background 0.15s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .play-btn:hover {
+    background: rgba(196, 122, 58, 0.1);
+  }
+
+  .play-btn:active {
+    transform: scale(0.95);
+  }
+
+  .play-btn .icon {
+    margin-left: 3px; /* optical centering for play triangle */
+  }
+
+  .play-btn.playing .icon {
+    margin-left: 0;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .control-row label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #aaa;
+    width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #3A2010;
+    background: #1C1007;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  select:focus {
+    border-color: #C47A3A;
+  }
+
+  .slider-group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  input[type="range"] {
+    flex: 1;
+    accent-color: #C47A3A;
+    cursor: pointer;
+  }
+
+  .freq-value {
+    font-size: 0.85rem;
+    color: #C47A3A;
+    font-weight: 700;
+    min-width: 72px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .bpm-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #C47A3A;
+    min-width: 32px;
+    text-align: left;
+  }
+
+  .loading {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Tanpura</h1>
+  <p class="subtitle">Drone Simulator</p>
+
+  <div class="beats">
+    <div class="beat" data-beat="0">
+      <span class="label">1</span>
+      <span class="note">Pa</span>
+    </div>
+    <div class="beat rest" data-beat="1">
+      <span class="label">2</span>
+      <span class="note">&mdash;</span>
+    </div>
+    <div class="beat" data-beat="2">
+      <span class="label">3</span>
+      <span class="note">Sa</span>
+    </div>
+    <div class="beat" data-beat="3">
+      <span class="label">4</span>
+      <span class="note">Sa</span>
+    </div>
+    <div class="beat" data-beat="4">
+      <span class="label">5</span>
+      <span class="note">Kharaj</span>
+    </div>
+    <div class="beat rest" data-beat="5">
+      <span class="label">6</span>
+      <span class="note">&mdash;</span>
+    </div>
+  </div>
+
+  <button class="play-btn" id="playBtn" disabled>
+    <span class="icon">&#9654;</span>
+  </button>
+
+  <div class="controls">
+    <div class="control-row">
+      <label for="pitch">Pitch</label>
+      <select id="pitch">
+        <option value="45">A2</option>
+        <option value="46">A#2</option>
+        <option value="47">B2</option>
+        <option value="48">C3</option>
+        <option value="49" selected>C#3</option>
+        <option value="50">D3</option>
+        <option value="51">D#3</option>
+        <option value="52">E3</option>
+        <option value="53">F3</option>
+        <option value="54">F#3</option>
+        <option value="55">G3</option>
+        <option value="56">G#3</option>
+        <option value="57">A3</option>
+        <option value="58">A#3</option>
+        <option value="59">B3</option>
+        <option value="60">C4</option>
+        <option value="61">C#4</option>
+        <option value="62">D4</option>
+        <option value="63">D#4</option>
+        <option value="64">E4</option>
+      </select>
+      <span class="freq-value" id="freqValue">138.59 Hz</span>
+    </div>
+    <div class="control-row">
+      <label for="bpm">BPM</label>
+      <div class="slider-group">
+        <input type="range" id="bpm" min="40" max="120" value="60">
+        <span class="bpm-value" id="bpmValue">60</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="loading" id="status">Loading samples...</p>
+</div>
+
+<script>
+(function () {
+  // --- State ---
+  let audioCtx = null;
+  let playing = false;
+  let currentBeat = -1;
+  let timerId = null;
+  let activeSources = [];
+
+  // --- DOM ---
+  const playBtn = document.getElementById('playBtn');
+  const pitchSel = document.getElementById('pitch');
+  const bpmSlider = document.getElementById('bpm');
+  const bpmValue = document.getElementById('bpmValue');
+  const freqValue = document.getElementById('freqValue');
+  const status = document.getElementById('status');
+  const beatEls = document.querySelectorAll('.beat');
+
+  // --- Beat pattern: [stringName or null for rest] ---
+  const pattern = ['Pa', null, 'Sa', 'Sa', 'Kharaj', null];
+
+  // --- Sample catalog ---
+  // Each sample: { file, midi, buffer }
+  // midi = the actual sounding MIDI note of the recording
+  // Pa sounds a 5th above root, Sa at root, Kharaj an octave below root
+  const sampleCatalog = {
+    Pa: [
+      { file: 'samples/Tanpura_C%233_Pa.wav', midi: 56 },       // G#3
+      { file: 'samples/Tanpura_C%233Alt_Pa.wav', midi: 56 },     // G#3 alt
+    ],
+    Sa: [
+      { file: 'samples/Tanpura_C%233_Sa.wav', midi: 49 },        // C#3
+      { file: 'samples/Tanpura_C%233Alt_Sa.wav', midi: 49 },      // C#3 alt
+      { file: 'samples/Tanpura_G%233_Sa.wav', midi: 56 },         // G#3
+    ],
+    Kharaj: [
+      { file: 'samples/Tanpura_C%233_Kharaj.wav', midi: 37 },    // C#2
+      { file: 'samples/Tanpura_C%233Alt_Kharaj.wav', midi: 37 },  // C#2 alt
+      { file: 'samples/Tanpura_G%233_Kharaj.wav', midi: 44 },     // G#2
+    ]
+  };
+
+  // --- Helpers ---
+  function midiToFreq(midi) {
+    return 440 * Math.pow(2, (midi - 69) / 12);
+  }
+
+  function getRootMidi() {
+    return parseInt(pitchSel.value, 10);
+  }
+
+  // Target MIDI note for each string given root
+  function getTargetMidi(stringName, rootMidi) {
+    if (stringName === 'Pa') return rootMidi + 7;
+    if (stringName === 'Kharaj') return rootMidi - 12;
+    return rootMidi; // Sa
+  }
+
+  // Find the best sample for a string to reach targetMidi (smallest pitch shift)
+  function findBestSample(stringName, targetMidi) {
+    const samples = sampleCatalog[stringName];
+    let best = samples[0];
+    let bestDist = Math.abs(targetMidi - best.midi);
+    for (let i = 1; i < samples.length; i++) {
+      const dist = Math.abs(targetMidi - samples[i].midi);
+      if (dist < bestDist) {
+        best = samples[i];
+        bestDist = dist;
+      }
+    }
+    return best;
+  }
+
+  // --- Load samples ---
+  async function loadSamples() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    try {
+      const allSamples = [];
+      for (const stringName in sampleCatalog) {
+        for (const sample of sampleCatalog[stringName]) {
+          allSamples.push(sample);
+        }
+      }
+
+      await Promise.all(allSamples.map(async (sample) => {
+        const resp = await fetch(sample.file);
+        if (!resp.ok) throw new Error('Failed to load ' + sample.file);
+        const arrayBuf = await resp.arrayBuffer();
+        sample.buffer = await audioCtx.decodeAudioData(arrayBuf);
+      }));
+
+      status.textContent = '';
+      playBtn.disabled = false;
+    } catch (e) {
+      status.textContent = 'Error loading samples: ' + e.message;
+      console.error(e);
+    }
+  }
+
+  // --- Playback ---
+  function pluck(stringName) {
+    const rootMidi = getRootMidi();
+    const targetMidi = getTargetMidi(stringName, rootMidi);
+    const sample = findBestSample(stringName, targetMidi);
+    if (!sample.buffer) return;
+
+    const shift = targetMidi - sample.midi;
+    const rate = Math.pow(2, shift / 12);
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = sample.buffer;
+    source.playbackRate.value = rate;
+    source.connect(audioCtx.destination);
+    source.start(0);
+
+    activeSources.push(source);
+    source.onended = function () {
+      const idx = activeSources.indexOf(source);
+      if (idx !== -1) activeSources.splice(idx, 1);
+    };
+  }
+
+  function highlightBeat(index) {
+    beatEls.forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+  }
+
+  function getBeatDuration() {
+    return 60 / parseInt(bpmSlider.value, 10);
+  }
+
+  function scheduleNext() {
+    if (!playing) return;
+
+    currentBeat = (currentBeat + 1) % pattern.length;
+    const stringName = pattern[currentBeat];
+
+    highlightBeat(currentBeat);
+
+    if (stringName) {
+      pluck(stringName);
+    }
+
+    const beatDur = getBeatDuration();
+    timerId = setTimeout(scheduleNext, beatDur * 1000);
+  }
+
+  function startPlaying() {
+    if (playing) return;
+
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    playing = true;
+    currentBeat = -1;
+    playBtn.classList.add('playing');
+    playBtn.querySelector('.icon').innerHTML = '&#9646;&#9646;';
+
+    scheduleNext();
+  }
+
+  function stopPlaying() {
+    playing = false;
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+
+    for (const source of activeSources) {
+      try { source.stop(); } catch (e) {}
+    }
+    activeSources = [];
+
+    currentBeat = -1;
+    highlightBeat(-1);
+    playBtn.classList.remove('playing');
+    playBtn.querySelector('.icon').innerHTML = '&#9654;';
+  }
+
+  // --- Events ---
+  playBtn.addEventListener('click', function () {
+    if (playing) {
+      stopPlaying();
+    } else {
+      startPlaying();
+    }
+  });
+
+  bpmSlider.addEventListener('input', function () {
+    bpmValue.textContent = this.value;
+  });
+
+  function updateFreqDisplay() {
+    freqValue.textContent = midiToFreq(getRootMidi()).toFixed(2) + ' Hz';
+  }
+
+  pitchSel.addEventListener('change', updateFreqDisplay);
+
+  // --- Init ---
+  loadSamples();
+})();
+</script>
+</body>
+</html>
