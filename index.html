@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tanpura Simulator</title>
+<title>Tambura</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -20,7 +20,7 @@
   .container {
     text-align: center;
     padding: 2rem;
-    max-width: 500px;
+    max-width: 560px;
     width: 100%;
   }
 
@@ -41,13 +41,13 @@
   .beats {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 2rem;
   }
 
   .beat {
-    width: 72px;
-    height: 72px;
+    width: 82px;
+    height: 80px;
     border-radius: 10px;
     background: #1C1007;
     border: 2px solid #3A2010;
@@ -199,8 +199,8 @@
 </head>
 <body>
 <div class="container">
-  <h1>Tanpura</h1>
-  <p class="subtitle">Drone Simulator</p>
+  <h1>Tambura</h1>
+  <p class="subtitle">Carnatic Drone Simulator</p>
 
   <div class="beats">
     <div class="beat" data-beat="0">
@@ -433,7 +433,7 @@
     playing = true;
     currentBeat = -1;
     playBtn.classList.add('playing');
-    playBtn.querySelector('.icon').innerHTML = '&#9646;&#9646;';
+    playBtn.querySelector('.icon').innerHTML = '&#9632;';
 
     scheduleNext();
   }
