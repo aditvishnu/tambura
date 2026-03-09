@@ -472,6 +472,7 @@
 
   bpmSlider.addEventListener('input', function () {
     bpmValue.textContent = this.value + ' BPM';
+    localStorage.setItem('tambura_bpm', this.value);
   });
 
   function updateFreqDisplay() {
@@ -480,7 +481,10 @@
     string1FreqValue.textContent = midiToFreq(getTargetMidi(string1Sel.value, rootMidi)).toFixed(2) + ' Hz';
   }
 
-  pitchSel.addEventListener('change', updateFreqDisplay);
+  pitchSel.addEventListener('change', function () {
+    updateFreqDisplay();
+    localStorage.setItem('tambura_pitch', this.value);
+  });
 
   const string1Labels = { Ma: 'Madhyamam', Pa: 'Panchamam', Ni: 'Nishadam' };
   const beat1NoteEl = beatEls[0].querySelector('.note');
@@ -489,7 +493,25 @@
     pattern[0] = this.value;
     beat1NoteEl.textContent = string1Labels[this.value];
     updateFreqDisplay();
+    localStorage.setItem('tambura_string1', this.value);
   });
+
+  // --- Restore saved preferences ---
+  const savedPitch   = localStorage.getItem('tambura_pitch');
+  const savedString1 = localStorage.getItem('tambura_string1');
+  const savedBpm     = localStorage.getItem('tambura_bpm');
+
+  if (savedPitch)   { pitchSel.value = savedPitch; }
+  if (savedString1) {
+    string1Sel.value = savedString1;
+    pattern[0] = savedString1;
+    beat1NoteEl.textContent = string1Labels[savedString1];
+  }
+  if (savedBpm) {
+    bpmSlider.value = savedBpm;
+    bpmValue.textContent = savedBpm + ' BPM';
+  }
+  updateFreqDisplay();
 
   // --- Init ---
   loadSamples();
